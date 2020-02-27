@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, Component } from "react";
 import styles from "./index.css";
 
 const initialState = {
@@ -7,19 +7,34 @@ const initialState = {
   isClicked: false
 };
 
-const MediumClap = () => {
+const withClapAnimation = WrappedComponent => {
+  class WithClapAnimation extends Component {
+    animane = () => {
+      console.log("animate");
+    };
+
+    render() {
+      return <WrappedComponent {...this.props} animane={this.animane} />;
+    }
+  }
+
+  return WithClapAnimation;
+};
+
+const MediumClap = ({ animane }) => {
   const MAX_USER_CLAP = 12;
   const [clapState, setClapState] = useState(initialState);
   const { count, countTotal, isClicked } = clapState;
 
-  const onClap = () => [
+  const onClap = () => {
+    animane();
     setClapState(prevState => ({
       isClicked: true,
       count: Math.min(prevState.count + 1, MAX_USER_CLAP),
       countTotal:
         count < MAX_USER_CLAP ? prevState.countTotal + 1 : prevState.countTotal
-    }))
-  ];
+    }));
+  };
 
   return (
     <button className={styles.clap} onClick={onClap}>
@@ -55,4 +70,10 @@ const ClapTotal = ({ countTotal }) => {
   return <span className={styles.total}>{countTotal}</span>;
 };
 
-export default MediumClap;
+const Usage = () => {
+  const AnimatedMdiumClap = withClapAnimation(MediumClap);
+
+  return <AnimatedMdiumClap />;
+};
+
+export default Usage;
